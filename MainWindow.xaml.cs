@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Forms;
+using System.Windows.Media;
+using ComboBox = System.Windows.Controls.ComboBox;
 
 namespace TextWallpaperCreator
 {
@@ -35,7 +39,23 @@ namespace TextWallpaperCreator
             InitializeComponent();
             componentsInitialized = true;
             colorPicker = (ColorPicker) FindName("ColorPicker");
+            InitializeFontSelector();
             InitializeWindowSize();
+        }
+
+        private void InitializeFontSelector()
+        {
+            var sysDrawingFamilies = System.Drawing.FontFamily.Families;
+            
+            var commonFontFamilies =
+                Fonts.SystemFontFamilies
+                    .Where(
+                        ff =>
+                            sysDrawingFamilies
+                                .Select(sdff => sdff.GetName(0)).Contains(ff.Source)
+                    );
+            fonts.AddRange(commonFontFamilies);
+            FontSelector.ItemsSource = fonts;
         }
 
         private void InitializeWindowSize()
@@ -58,18 +78,13 @@ namespace TextWallpaperCreator
             WallpaperText.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
 
             var imagePath = Path.Combine(Path.GetTempPath(), $"{DateTime.Now.ToFileTime()}.png");
-
-            var aspect = Screen.PrimaryScreen.Bounds.Height / WallpaperBackground.Height;
-
-            var inAppSize = new Size(WallpaperText.DesiredSize.Width * aspect,
-                WallpaperText.DesiredSize.Height * aspect);
-
+            
             ImageGenerator.CreateImage(
                     WallpaperText.Text,
                     colorPicker.elementColors[ColorPicker.ElementToColor.Background],
                     colorPicker.elementColors[ColorPicker.ElementToColor.TextBox],
                     (float) ActualFontSize,
-                    inAppSize
+                    WallpaperText.FontFamily.Source
                 )
                 .Save(imagePath, ImageFormat.Png);
 
@@ -95,7 +110,7 @@ namespace TextWallpaperCreator
 
         private void ResizeView(object sender, SizeChangedEventArgs e)
         {
-            WallpaperBackground.Height = (e.NewSize.Width - defaultToolsWidth) * aspectRatio;
+            WallpaperBackground.Height = Math.Min(ActualHeight, (e.NewSize.Width - defaultToolsWidth) * aspectRatio);
             MainGrid.ColumnDefinitions[0].Width =
                 new GridLength(Math.Max(e.NewSize.Width - e.NewSize.Height / aspectRatio, defaultToolsWidth));
             UpdateWallpaperFontSize();
@@ -104,6 +119,13 @@ namespace TextWallpaperCreator
         private void OnSliderValueChanged_ResizeFont(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             ActualFontSize = minFontSize + (maxFontSize - minFontSize) * e.NewValue / ((Slider) sender).Maximum;
+        }
+
+        private void ComboBox_Selected(object sender, RoutedEventArgs e)
+        {
+            var comboBox = (ComboBox) sender;
+            var fontFamily = (FontFamily) comboBox.SelectedItem;
+            WallpaperText.FontFamily = fontFamily;
         }
     }
 }

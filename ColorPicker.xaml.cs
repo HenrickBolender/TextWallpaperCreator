@@ -40,7 +40,6 @@ namespace TextWallpaperCreator
                 if (selectedColor == value) 
                     return;
                 selectedColor = value;
-                UpdateTextBoxes();
             }
         }
 
@@ -131,15 +130,6 @@ namespace TextWallpaperCreator
             ellipsePixel.SetValue(Canvas.TopProperty, searchY - ellipsePixel.Width / 2.0);
         }
 
-        private void UpdateTextBoxes()
-        {
-            txtRed.Text = SelectedColor.R.ToString();
-            txtRedHex.Text = SelectedColor.R.ToString("X2");
-            txtGreen.Text = SelectedColor.G.ToString();
-            txtGreenHex.Text = SelectedColor.G.ToString("X2");
-            txtBlue.Text = SelectedColor.B.ToString();
-            txtBlueHex.Text = SelectedColor.B.ToString("X2");
-            txtAll.Text = $"#{txtRedHex.Text}{txtGreenHex.Text}{txtBlueHex.Text}";
-        }
+
     }
 }
