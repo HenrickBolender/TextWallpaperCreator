@@ -4,7 +4,7 @@ Simple WPF app for creating desktop images where you can put your text.
 
 You can set custom font and background colors + change font size.
 
-[03.19 UPDATE] Now you can also select your custom FontFamily from system
+__[03.19 UPDATE]__ Now you can also select your custom FontFamily from system.
 
 ![image](https://user-images.githubusercontent.com/40788127/75629161-65bf9b00-5c01-11ea-8816-28beca520deb.png)
 
